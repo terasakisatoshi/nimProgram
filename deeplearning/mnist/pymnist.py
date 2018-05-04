@@ -41,23 +41,28 @@ def train():
         chainer.cuda.get_device_from_id(DEVICE).use()
         chainer.cuda.check_cuda_available()
         model.to_gpu()
-    train, test = chainer.datasets.get_mnist(ndim=3)
-    train_iter = iterators.SerialIterator(train, BATCH_SIZE, shuffle=True)
-    test_iter = iterators.SerialIterator(test, 1, repeat=False, shuffle=False)
 
     optimizer = optimizers.SGD(lr=0.01)
     optimizer.setup(model)
 
-    updater = training.StandardUpdater(train_iter, optimizer, device=DEVICE)
+    train, test = chainer.datasets.get_mnist(ndim=3)
+    train_iter = chainer.iterators.SerialIterator(
+        train, BATCH_SIZE, shuffle=True)
+    test_iter = chainer.iterators.SerialIterator(
+        test, BATCH_SIZE, repeat=False, shuffle=False)
+
+    updater = training.updaters.StandardUpdater(
+        train_iter, optimizer, device=DEVICE)
     trainer = training.Trainer(updater, (5, 'epoch'), out='result')
 
     log_interval = (100, 'iteration')
-    trainer.extend(extensions.Evaluator(test_iter, model, device=DEVICE))
+    trainer.extend(extensions.Evaluator(test_iter, model,
+                                        device=DEVICE), trigger=log_interval)
     trainer.extend(extensions.LogReport(trigger=log_interval))
-    trainer.extend(extensions.PrintReport([
-        'iteration', 'main/loss', 'validation/main/loss',
-        'main/accuracy', 'validation/main/accuracy', 'elapsed_time'
-    ]), trigger=log_interval)
+    trainer.extend(extensions.PrintReport(
+        ['iteration', 'main/loss', 'validation/main/loss',
+         'main/accuracy', 'validation/main/accuracy', 'elapsed_time']), trigger=log_interval)
+
     trainer.extend(extensions.ProgressBar())
 
     with chainer.using_config('train', True):
