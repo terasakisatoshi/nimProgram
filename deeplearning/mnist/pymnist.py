@@ -55,7 +55,7 @@ def train():
         train_iter, optimizer, device=DEVICE)
     trainer = training.Trainer(updater, (5, 'epoch'), out='result')
 
-    log_interval = (100, 'iteration')
+    log_interval = (1, 'epoch')
     trainer.extend(extensions.Evaluator(test_iter, model,
                                         device=DEVICE), trigger=log_interval)
     trainer.extend(extensions.LogReport(trigger=log_interval))
@@ -88,8 +88,9 @@ def predict():
 
 
 def main():
-    train()
-    predict()
+    with chainer.using_config('use_ideep', 'auto'):
+        train()
+        #predict()
 
 
 if __name__ == '__main__':
