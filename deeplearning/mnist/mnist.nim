@@ -1,6 +1,6 @@
 import arraymancer
 import random
-
+import times
 
 # This is an early minimum viable example of handwritten digits recognition.
 # It uses convolutional neural networks to achieve high accuracy.
@@ -53,6 +53,7 @@ let optim = model.optimizerSGD(learning_rate = 0.01'f32)
 
 # Learning loop
 for epoch in 0 ..< 5:
+  var time = cpuTime()
   for batch_id in 0 ..< X_train.value.shape[0] div n: # some at the end may be missing, oh well ...
     # minibatch offset in the Tensor
     let offset = batch_id * n
@@ -65,6 +66,7 @@ for epoch in 0 ..< 5:
 
     if batch_id mod 200 == 0:
       # Print status every 200 batches
+      echo "Elapsed   " & $((cpuTime()-time)/10.0) & "[sec]"
       echo "Epoch is: " & $epoch
       echo "Batch id: " & $batch_id
       echo "Loss is:  " & $loss.value.data[0]
