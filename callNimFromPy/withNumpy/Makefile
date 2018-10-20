@@ -1,6 +1,6 @@
-libstats.dylib: stats.nim 
-	nim c -d:release --app:lib stats.nim
+libstats.dylib: do_something.nim 
+	nim c -d:release --app:lib do_something.nim
 
 clean:
 	rm -rf nimcache
-	rm -f libstats.dylib
+	rm -f libdo_something.dylib
